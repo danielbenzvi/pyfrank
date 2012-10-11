@@ -23,6 +23,7 @@
 # The views and conclusions contained in the software and documentation are those of the
 # authors and should not be interpreted as representing official policies, either expressed
 # or implied, of Do@.
+
 __author__ = 'Daniel Ben-Zvi'
 
 import sys
@@ -83,10 +84,16 @@ class Response(object):
         """
         return self._data.get(key, default)
 
+    def raw(self):
+        return self._data
+
     def outcome(self):
         return self.get('outcome')
 
     def __getattr__(self, item):
+        return self.get(item)
+
+    def __getitem__(self, item):
         return self.get(item)
 
     @staticmethod
@@ -146,7 +153,7 @@ class Dump(Response):
     Represents the entire application UI graph
     """
     def __str__(self):
-        return str(self.outcome())
+        return str(self._data)
 
     @staticmethod
     def parse(data):
@@ -253,7 +260,7 @@ class Request(object):
         self._complete = Event()
         self._error = None
 
-    def _execute(self, query, data=None, timeout=5):
+    def _execute(self, query, data=None, timeout=15):
         """
         Execute a query to frank
 
@@ -416,7 +423,7 @@ class Device(object):
 
         Returns dict
         """
-        return Request(self).dump().outcome()
+        return Request(self).dump().raw()
 
 
     def typeIntoKeyboard(self, text):
